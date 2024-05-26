@@ -24,9 +24,11 @@
 
     [cuDNN Archive | NVIDIA Developer](https://developer.nvidia.com/rdp/cudnn-archive)
 
-* ppocr版本为2.7.1（已经将整个文件放在了仓库中）
+* ppocr版本为2.7.1（已经将整个文件放在了网盘中）
 
   [PaddlePaddle/PaddleOCR at release/2.7.1 (github.com)](https://github.com/PaddlePaddle/PaddleOCR/tree/release/2.7.1)
+
+  链接: https://pan.baidu.com/s/1v0JsIAjUcVdUkJOVcyBJKg?pwd=dvka 提取码: dvka
 
   * requirement
 
@@ -128,7 +130,7 @@
 
       `python tools/train.py -c configs/rec/PP-OCRv3/ch_PP-OCRv3_rec.yml`
 
-* 模型测试
+* 模型测试（训练后的模型过大，暂未上传）
 
   * det
 
