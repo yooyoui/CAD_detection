@@ -34,6 +34,10 @@
 
     `pip install -r requirements.txt -i https://mirror.baidu.com/pypi/simple/`
 
+  * 若从github上clone，需注意2.7.1版本在运行时存在bug，导致PPOCRLabel出现List index out of range的错误，此时需将`./ppstructure/utility.py`的第116行后加入
+
+        parser.add_argument("--return_word_box", type=str2bool, default=False, help='Whether return the bbox of each word (split by space) or chinese character. Only used in ppstructure for layout recovery')
+
 * 测试图片存放位置
 
   `./doc/datasets/cad/`
