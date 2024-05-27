@@ -17,11 +17,9 @@
 * Paddlepaddle版本为2.5.2
 
   ```python
-  `python -m pip install paddlepaddle-gpu==2.5.2 `
-  
-  `-i https://pypi.tuna.tsinghua.edu.cn/simple`
+  python -m pip install paddlepaddle-gpu==2.5.2 -i https://pypi.tuna.tsinghua.edu.cn/simple
   ```
-
+  
   * 对应CUDA版本v11.8
 
     [CUDA Toolkit 11.8 Downloads | NVIDIA Developer](https://developer.nvidia.com/cuda-11-8-0-download-archive)
@@ -167,7 +165,7 @@
   * rec
 
     ```python
-    ` python tools/infer_rec.py -c configs/rec/PP-OCRv3/ch_PP-OCRv3_rec.yml -o Global.pretrained_model=output/rec_ppocr_v3/best_accuracy.pdparams Global.infer_img="./train_data/rec/test/1_crop_0.jpg"`
+    python tools/infer_rec.py -c configs/rec/PP-OCRv3/ch_PP-OCRv3_rec.yml -o Global.pretrained_model=output/rec_ppocr_v3/best_accuracy.pdparams Global.infer_img="./train_data/rec/test/1_crop_0.jpg"
     ```
 
 * 转换成推理模型
@@ -189,11 +187,11 @@
   * 再使用predict_system.py进行验证
 
     ```python
-    `python tools/infer/predict_system.py --image_dir="./path/to/image" `
+    python tools/infer/predict_system.py --image_dir="./path/to/image" 
     
-    `--det_model_dir="./inference_model/det/" `
+    --det_model_dir="./inference_model/det/" 
     
-    `--rec_model_dir="./inference_model/rec"`
+    --rec_model_dir="./inference_model/rec"
     ```
 
 [^1]: 轻量级模型
