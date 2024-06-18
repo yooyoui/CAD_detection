@@ -196,3 +196,275 @@
 
 [^1]: 轻量级模型
 [^2]: 服务端模型
+
+## 二、使用Grpc来在java中调用python脚本
+
+### 1. protobuf文件的编写
+
+*整体代码*
+
+```protobuf
+//@ 1 使用proto3语法
+syntax = "proto3";
+//@ 2 生成多个类（一个类便于管理）
+option java_multiple_files = false;
+//@ 3 定义调用时的java包名
+option java_package= "com.chan.grpc_callpy.proto";
+//@ 4 生成外部类名
+option java_outer_classname = "CallpyProto";
+//@ 6. proto包名称（逻辑包名称）
+package callpy;
+
+import "google/protobuf/struct.proto";
+
+//@ 7 定义一个服务来描述要生成的API接口，类似于Java的业务逻辑接口类
+service CallpyService{
+  //定义执行方法，方法名称和参数和返回值都是大驼峰
+  //Note: 这里是 returns,不是 return
+  rpc Execute (ScriptRequest) returns (ScriptResponse) {}
+}
+
+//@ 8 定义请求数据结构
+//字符串数据类型
+//等号后面的数字即索引值（表示参数顺序，以防止参数传递顺序混乱），服务启动后无法更改
+//不能使用19000-1999保留数字
+message ScriptRequest{
+  string content = 1;
+  google.protobuf.ListValue extract_params = 2;
+}
+//@ 9 定义响应数据结构
+message ScriptResponse{
+  string result = 1;
+}
+```
+
+### 2. 依赖
+
+*使用了Maven进行依赖管理*
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.3.0</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+    <groupId>com.chan</groupId>
+    <artifactId>grpc_callpy</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>grpc_callpy</name>
+    <description>grpc_callpy</description>
+    <properties>
+        <java.version>17</java.version>
+    </properties>
+    <dependencies>
+
+        <!-- Spring Boot Starter Web -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- Spring Boot Test -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>annotationProcessor</scope>
+        </dependency>
+
+        <!-- Mybatis-Plus Spring Boot Starter-->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+            <version>3.5.5</version>
+        </dependency>
+
+        <!-- SQLite数据库驱动 -->
+        <!-- https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc -->
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.42.0.0</version>
+        </dependency>
+
+        <!--druid数据库连接池依赖-->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid-spring-boot-starter</artifactId>
+            <version>1.2.8</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/net.devh/grpc-client-spring-boot-starter -->
+        <dependency>
+            <groupId>net.devh</groupId>
+            <artifactId>grpc-client-spring-boot-starter</artifactId>
+            <version>3.1.0.RELEASE</version>
+        </dependency>
+
+        <!-- gRPC -->
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-netty-shaded</artifactId>
+            <version>1.64.0</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-protobuf</artifactId>
+            <version>1.64.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-stub</artifactId>
+            <version>1.64.0</version>
+        </dependency>
+
+        <dependency> <!-- necessary for Java 9+ -->
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>annotations-api</artifactId>
+            <version>6.0.53</version>
+            <scope>provided</scope>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+
+            <!-- Protobuf Maven Plugin -->
+            <plugin>
+                <groupId>org.xolstice.maven.plugins</groupId>
+                <artifactId>protobuf-maven-plugin</artifactId>
+                <version>0.6.1</version>
+                <configuration>
+                    <protocArtifact>com.google.protobuf:protoc:3.25.1:exe:${os.detected.classifier}</protocArtifact>
+                    <pluginId>grpc-java</pluginId>
+                    <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.64.0:exe:${os.detected.classifier}</pluginArtifact>
+                    <outputDirectory>${basedir}/src/main/java</outputDirectory>
+                    <clearOutputDirectory>false</clearOutputDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>compile</goal>
+                            <goal>compile-custom</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+
+```
+
+### 3.服务配置：application.yaml
+
+```yaml
+# gpc client config
+grpc:
+  client:
+    CallpyServiceGrpc:
+      address: 'static://127.0.0.1:50051'
+      negotiationType: plaintext
+
+# DataSource Config
+spring:
+  datasource:
+    url: jdbc:sqlite:D:\java_code\grpc_callpy\db\Cad.sqlite
+    driver-class-name: org.sqlite.JDBC
+    username:
+    password:
+  web:
+    resources:
+      static-locations: classpath:/static/
+
+```
+
+### 4.Java部分代码
+
+*详见src*
+
+### 5.Python部分代码
+
+* 需要安装protobuf插件
+
+* 需要安装依赖
+
+  * ```python
+    pip install grpcio
+    pip install grpcio-tools googleapis-common-protos
+    ```
+
+  * ```python
+    # proto生成代码
+    python -m grpc_tools.protoc -I . --python_out=. --grpc_python_out=. script.proto
+    ```
+
+    * 此时生成两个文件`script_pb2_grpc.py`和`script_pb2.py
+
+#### 客户端代码
+
+```python
+import json
+
+import grpc
+import script_pb2
+import script_pb2_grpc
+from concurrent import futures
+import time
+
+_ONE_DAY_IN_SECONDS = 60 * 60 * 24
+
+
+# service impl
+class ScriptServicer(script_pb2_grpc.ScriptServiceServicer):
+
+    def Execute(self, request, context):
+        s = request.content
+        result = {}
+        print("content: %s" % s)
+        exec(s, result)
+
+        # 根据传入的参数提取值
+        data = {}
+        for p in request.extract_params:
+            data[p] = result.get(p, None)
+
+        return script_pb2.ScriptResponse(result=json.dumps(data))
+
+
+def serve():
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+    script_pb2_grpc.add_ScriptServiceServicer_to_server(ScriptServicer(), server)
+    server.add_insecure_port('[::]:50051')
+    server.start()
+    try:
+        while True:
+            time.sleep(_ONE_DAY_IN_SECONDS)
+    except KeyboardInterrupt:
+        server.stop(0)
+
+
+if __name__ == '__main__':
+    serve()
+```
+
+
+
