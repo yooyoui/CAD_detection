@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import lombok.Data;
+import org.springframework.stereotype.Component;
 
 /**
  *
@@ -66,4 +67,5 @@ public class Cad implements Serializable {
         sb.append("]");
         return sb.toString();
     }
+
 }

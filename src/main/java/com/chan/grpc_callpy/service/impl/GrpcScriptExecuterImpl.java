@@ -28,6 +28,7 @@ public class GrpcScriptExecuterImpl implements IScriptExecute {
         // 获取ScriptContent对象的content属性
         String c = content.getContent();
         // 参数1判空
+        // 如果c为空，则返回一个ScriptExecResult对象，结果为null
         if (c.isEmpty()) return new ScriptExecResult(null);
         // 获取ScriptContent对象的extractParams属性
         List<String> extractParams = content.getExtractParams();
@@ -35,6 +36,7 @@ public class GrpcScriptExecuterImpl implements IScriptExecute {
         CallpyProto.ScriptRequest.Builder r = CallpyProto.ScriptRequest.newBuilder()
                 .setContent(c);
         // 参数2判空
+        // 如果extractParams不为空，则将extractParams中的每个元素添加到ListValue对象中
         if (!extractParams.isEmpty()) {
             ListValue.Builder lvb = ListValue.newBuilder();
             for (String ep : extractParams) {

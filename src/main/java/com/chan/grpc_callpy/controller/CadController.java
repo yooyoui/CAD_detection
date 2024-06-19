@@ -14,16 +14,21 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/cad")
 public class CadController {
 
+    private CadMapper cadMapper;
     @Autowired
-    CadMapper cadMapper;
+    public void setCadMapper(CadMapper cadMapper) {
+        this.cadMapper = cadMapper;
+    }
 
     /**
      * 增添数据
      */
     @GetMapping("/insert")
-    public Object insert(String content) {
-        Cad cad = new Cad();
-        cad.setContent(content);
+    public Object insert() {
+        Cad cad = ApiController.getCad();
+        if (cad == null) {
+            return "No content found, please execute the script first";
+        }
         return cadMapper.insert(cad);
     }
 
