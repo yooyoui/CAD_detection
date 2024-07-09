@@ -209,18 +209,16 @@ syntax = "proto3";
 //@ 2 生成多个类（一个类便于管理）
 option java_multiple_files = false;
 //@ 3 定义调用时的java包名
-option java_package= "com.chan.grpc_callpy.proto";
+option java_package= "com.chan.proto";
 //@ 4 生成外部类名
-option java_outer_classname = "CallpyProto";
+option java_outer_classname = "CallPyProto";
 //@ 6. proto包名称（逻辑包名称）
-package callpy;
+package CallPyProto;
 
 import "google/protobuf/struct.proto";
 
 //@ 7 定义一个服务来描述要生成的API接口，类似于Java的业务逻辑接口类
-service CallpyService{
-  //定义执行方法，方法名称和参数和返回值都是大驼峰
-  //Note: 这里是 returns,不是 return
+service CallPyService{
   rpc Execute (ScriptRequest) returns (ScriptResponse) {}
 }
 
@@ -230,7 +228,6 @@ service CallpyService{
 //不能使用19000-1999保留数字
 message ScriptRequest{
   string content = 1;
-  google.protobuf.ListValue extract_params = 2;
 }
 //@ 9 定义响应数据结构
 message ScriptResponse{
@@ -254,15 +251,15 @@ message ScriptResponse{
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.chan</groupId>
-    <artifactId>grpc_callpy</artifactId>
+    <artifactId>grpc</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>grpc_callpy</name>
-    <description>grpc_callpy</description>
+    <name>grpc</name>
+    <description>grpc</description>
     <properties>
+        <os.detected.classifier>windows-x86_64</os.detected.classifier>
         <java.version>17</java.version>
     </properties>
     <dependencies>
-
         <!-- Spring Boot Starter Web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -288,6 +285,18 @@ message ScriptResponse{
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
             <version>3.5.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-generator</artifactId>
+            <version>3.5.7</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity-engine-core</artifactId>
+            <version>2.3</version>
         </dependency>
 
         <!-- SQLite数据库驱动 -->
@@ -336,7 +345,6 @@ message ScriptResponse{
             <version>6.0.53</version>
             <scope>provided</scope>
         </dependency>
-
     </dependencies>
 
     <build>
@@ -371,37 +379,38 @@ message ScriptResponse{
     </build>
 
 </project>
-
 ```
 
-### 3.服务配置：application.yaml
+### 3. 服务配置：application.yml
 
 ```yaml
 # gpc client config
 grpc:
   client:
-    CallpyServiceGrpc:
+    CallPyServiceGrpc:
       address: 'static://127.0.0.1:50051'
       negotiationType: plaintext
 
 # DataSource Config
 spring:
   datasource:
-    url: jdbc:sqlite:D:\java_code\grpc_callpy\db\Cad.sqlite
+    url: jdbc:sqlite:D:\java_code\grpc\db\CatDetData.db
     driver-class-name: org.sqlite.JDBC
     username:
     password:
-  web:
-    resources:
-      static-locations: classpath:/static/
-
+server:
+  port: 8080
 ```
 
-### 4.Java部分代码
+### 4. Java部分代码
 
-*详见src*
+*详见JavaCode*
 
-### 5.Python部分代码
+* ApiController中定义了5个接口
+  * 1个调用py脚本的接口，参数为图片路径
+  * 4个调用数据库CRUD操作的接口
+
+### 5. Python部分代码
 
 * 需要安装protobuf插件
 
@@ -413,58 +422,21 @@ spring:
     ```
 
   * ```python
-    # proto生成代码
-    python -m grpc_tools.protoc -I . --python_out=. --grpc_python_out=. script.proto
+    # 入片代码
+    python -m grpc_tools.protoc -I . --python_out=. --grpc_python_out=. xxx.proto
     ```
 
-    * 此时生成两个文件`script_pb2_grpc.py`和`script_pb2.py
+    * 此时生成两个文件`xxx_pb2_grpc.py`和`xxx_pb2.py`
 
 #### 客户端代码
 
-```python
-import json
+*详见python_code*
 
-import grpc
-import script_pb2
-import script_pb2_grpc
-from concurrent import futures
-import time
-
-_ONE_DAY_IN_SECONDS = 60 * 60 * 24
-
-
-# service impl
-class ScriptServicer(script_pb2_grpc.ScriptServiceServicer):
-
-    def Execute(self, request, context):
-        s = request.content
-        result = {}
-        print("content: %s" % s)
-        exec(s, result)
-
-        # 根据传入的参数提取值
-        data = {}
-        for p in request.extract_params:
-            data[p] = result.get(p, None)
-
-        return script_pb2.ScriptResponse(result=json.dumps(data))
-
-
-def serve():
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    script_pb2_grpc.add_ScriptServiceServicer_to_server(ScriptServicer(), server)
-    server.add_insecure_port('[::]:50051')
-    server.start()
-    try:
-        while True:
-            time.sleep(_ONE_DAY_IN_SECONDS)
-    except KeyboardInterrupt:
-        server.stop(0)
-
-
-if __name__ == '__main__':
-    serve()
-```
+* CallPy_server为运行的主程序
+* 在ScriptExe中
+  * AlgoController 为算法的总控
+  * ppOcr 为算子1
+  * Config 为配置文件
 
 
 

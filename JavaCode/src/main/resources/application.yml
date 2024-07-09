@@ -1,0 +1,16 @@
+# gpc client config
+grpc:
+  client:
+    CallPyServiceGrpc:
+      address: 'static://127.0.0.1:50051'
+      negotiationType: plaintext
+
+# DataSource Config
+spring:
+  datasource:
+    url: jdbc:sqlite:D:\java_code\grpc\db\CatDetData.db
+    driver-class-name: org.sqlite.JDBC
+    username:
+    password:
+server:
+  port: 8080

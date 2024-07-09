@@ -1,0 +1,29 @@
+//@ 1 使用proto3语法
+syntax = "proto3";
+//@ 2 生成多个类（一个类便于管理）
+option java_multiple_files = false;
+//@ 3 定义调用时的java包名
+option java_package= "com.chan.proto";
+//@ 4 生成外部类名
+option java_outer_classname = "CallPyProto";
+//@ 6. proto包名称（逻辑包名称）
+package CallPyProto;
+
+import "google/protobuf/struct.proto";
+
+//@ 7 定义一个服务来描述要生成的API接口，类似于Java的业务逻辑接口类
+service CallPyService{
+  rpc Execute (ScriptRequest) returns (ScriptResponse) {}
+}
+
+//@ 8 定义请求数据结构
+//字符串数据类型
+//等号后面的数字即索引值（表示参数顺序，以防止参数传递顺序混乱），服务启动后无法更改
+//不能使用19000-1999保留数字
+message ScriptRequest{
+  string content = 1;
+}
+//@ 9 定义响应数据结构
+message ScriptResponse{
+  string result = 1;
+}
