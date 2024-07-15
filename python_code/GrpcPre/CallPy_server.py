@@ -9,7 +9,6 @@ from concurrent import futures
 import time
 
 from ScriptExe.AlgoController import AlgorithmController
-from ScriptExe.ppOcr import PpOcr
 from ScriptExe.Config import ConfigManager
 
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
