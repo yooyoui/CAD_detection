@@ -1,14 +1,14 @@
 # gpc client config
 grpc:
   client:
-    CallPyServiceGrpc:
+    CadDetServiceGrpc:
       address: 'static://127.0.0.1:50051'
       negotiationType: plaintext
 
 # DataSource Config
 spring:
   datasource:
-    url: jdbc:sqlite:D:\java_code\grpc\db\CatDetData.db
+    url: jdbc:sqlite:D:\java_code\projectGrpc\grpc-backend\db\CadDetMsg.db
     driver-class-name: org.sqlite.JDBC
     username:
     password:

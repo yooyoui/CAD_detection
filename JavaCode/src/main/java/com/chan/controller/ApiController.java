@@ -1,16 +1,18 @@
 package com.chan.controller;
 
-import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.chan.entity.CadContent;
-import com.chan.entity.CadData;
-import com.chan.service.impl.CadDataServiceImpl;
+import com.chan.entity.RequestContent;
+import com.chan.entity.ScriptExecResult;
+import com.chan.proto.CadDetProto;
+import com.chan.service.impl.CadContentServiceImpl;
 import com.chan.service.impl.GrpcScriptExecImpl;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @CrossOrigin
@@ -21,8 +23,7 @@ public class ApiController {
      * 功能：1. 调用python脚本并返回结果
      * 2. 数据库CRUD操作
      */
-
-    private Map<String, Object> tempDataMap;
+    private List<CadDetProto.DetInfo> tempData;
 
     private GrpcScriptExecImpl grpcScriptExec;
 
@@ -40,32 +41,44 @@ public class ApiController {
             return "";
         }
 
-        String result = this.grpcScriptExec.exec(new CadContent(path)).getResult();
-        tempDataMap = JSON.parseObject(result);
+        ScriptExecResult scriptExecResult = this.grpcScriptExec.exec(new RequestContent(path));
+        String fileName = scriptExecResult.getFileName();
+        List<CadDetProto.DetInfo> result = scriptExecResult.getResult();
 
-        return result;
+        this.tempData = result;
+
+        return fileName + " " + result;
     }
 
 
     @Resource
-    private CadDataServiceImpl dataService;
+    private CadContentServiceImpl dataService;
 
     // 数据库CRUD接口
     @PostMapping("/create")
     public Object create() {
 
-        if (this.tempDataMap != null) {
-            for (String obj : tempDataMap.keySet()) {
-                Object value = tempDataMap.get(obj);
+        if (this.tempData != null) {
+            for (CadDetProto.DetInfo obj : tempData) {
 
-                dataService.save(new CadData(obj, value.toString()));
-                System.out.println("Saving to database: Key = " + obj + ", Value = " + value);
+                int id = obj.getId();
+                CadDetProto.Position positions = obj.getPosition();
+                CadDetProto.Attribute attributes = obj.getAttribute();
+
+                String position = "[" + positions.getLeftTop() + ","
+                        + positions.getRightTop() + ","
+                        + positions.getRightBottom() + ","
+                        + positions.getLeftBottom() + "]";
+
+                String value = "" + attributes.getValueList();
+
+                dataService.save(new CadContent(position, value, id));
             }
-            tempDataMap = null;
+            tempData = null;
         } else {
             return ResponseEntity.badRequest().body("结果为空或未执行算法");
         }
-        return ResponseEntity.ok("create success");
+        return ResponseEntity.ok("数据已存入");
     }
 
     @GetMapping("/read")
@@ -79,7 +92,7 @@ public class ApiController {
         if (id == null || position == null || position.isEmpty() || value == null || value.isEmpty()) {
         return ResponseEntity.badRequest().body("参数不能为空");
     }
-        UpdateWrapper<CadData> updateWrapper = new UpdateWrapper<>();
+        UpdateWrapper<CadContent> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("id", id)
                 .set("position", position)
                 .set("value", value);

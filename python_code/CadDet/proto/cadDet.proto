@@ -1,0 +1,49 @@
+//@ 1 使用proto3语法
+syntax = "proto3";
+//@ 2 生成多个类（一个类便于管理）
+option java_multiple_files = false;
+//@ 3 定义调用时的java包名
+option java_package= "com.chan.proto";
+//@ 4 生成外部类名
+option java_outer_classname = "CadDetProto";
+//@ 6. proto包名称（逻辑包名称）
+package CadDetProto;
+
+import "google/protobuf/struct.proto";
+
+//@ 7 定义一个服务来描述要生成的API接口，类似于Java的业务逻辑接口类
+service CadDetService{
+  rpc Execute (CadDetRequest) returns (CadDetResponse) {}
+}
+
+//@ 8 定义请求数据结构
+// 位置信息
+message Position{
+  int32 left_top = 1;
+  int32 right_top = 2;
+  int32 left_bottom = 3;
+  int32 right_bottom = 4;
+}
+
+// 属性信息
+message Attribute {
+  repeated string value = 1;
+}
+
+// 检测信息
+message DetInfo {
+  int32 id = 1;
+  Position position = 2;
+  Attribute attribute = 3;
+}
+
+// 请求数据结构
+message CadDetRequest{
+  string filePath = 1;
+}
+
+// 响应数据结构
+message CadDetResponse{
+  string file_name = 1;
+  repeated DetInfo detInfo = 2;
+}
