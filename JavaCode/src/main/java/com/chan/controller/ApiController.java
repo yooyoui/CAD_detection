@@ -2,6 +2,7 @@ package com.chan.controller;
 
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.chan.entity.CadContent;
+import com.chan.entity.DetInfoDTO;
 import com.chan.entity.RequestContent;
 import com.chan.entity.ScriptExecResult;
 import com.chan.proto.CadDetProto;
@@ -12,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -47,9 +50,27 @@ public class ApiController {
 
         this.tempData = result;
 
+
         return fileName + " " + result;
     }
 
+    // test
+    @PostMapping("/getDataForTable")
+    public ResponseEntity<List<DetInfoDTO>> getDataForTable() {
+
+        List<DetInfoDTO> dtos = new ArrayList<>();
+        for (CadDetProto.DetInfo detInfo : this.tempData) {
+            List<Integer> position = Arrays.asList(
+                    detInfo.getPosition().getLeftTop(),
+                    detInfo.getPosition().getRightTop(),
+                    detInfo.getPosition().getRightBottom(),
+                    detInfo.getPosition().getLeftBottom()
+            );
+            List<String> attribute = new ArrayList<>(detInfo.getAttribute().getValueList());
+            dtos.add(new DetInfoDTO(detInfo.getId(), position, attribute));
+        }
+        return ResponseEntity.ok(dtos);
+    }
 
     @Resource
     private CadContentServiceImpl dataService;
@@ -90,8 +111,8 @@ public class ApiController {
     public Object update(@RequestParam Integer id, String position, String value) {
 
         if (id == null || position == null || position.isEmpty() || value == null || value.isEmpty()) {
-        return ResponseEntity.badRequest().body("参数不能为空");
-    }
+            return ResponseEntity.badRequest().body("参数不能为空");
+        }
         UpdateWrapper<CadContent> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("id", id)
                 .set("position", position)
