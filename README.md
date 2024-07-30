@@ -322,7 +322,7 @@ if __name__ == '__main__':
 ## 前端部分
 
  *前端效果展示*
-![frontend_test](.\image\frontend_test.png)
+![frontend_test](./image/frontend_test.png)
 
 
 
