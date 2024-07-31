@@ -14,3 +14,6 @@ spring:
     password:
 server:
   port: 8080
+
+file:
+  uploadFolder: D:/dev_code/java/projectGrpc/grpc-backend/src/main/resources/static/

@@ -16,18 +16,31 @@
 <script setup>
 import { ref } from 'vue';
 import axios from 'axios';
-import { getDataForTable } from '../utils/utils.js';
+import {getDataForTable} from '../utils/utils.js';
 
 const imagePath = ref('');
 const pyResponse = ref('');
 
+const showImg = () => {
+  axios.post('http://localhost:8080/CadDet/getResultImg')
+    .then(response => {
+        console.log(response);
+        document.getElementById('displayedImage').src = response.data;
+    })
+    .catch(error => {
+      console.error(error);
+      alert('Failed to load image.');
+    });
+};
+
 const callPy = () => {
   axios.post('http://localhost:8080/CadDet/CallPy', {
-    path: `--image_dir=${imagePath.value}`
+    path: `${imagePath.value}`
   }).then(response => {
     console.log(response);
     pyResponse.value = JSON.stringify(response.data);
     getDataForTable();
+    showImg();
   }).catch(error => {
     console.error(error.response.data);
     alert(error.response.data);

@@ -89,7 +89,7 @@ public class ApiController {
             throw new RuntimeException("Failed to save image.", e);
         }
 
-        return ResponseEntity.ok("图片已保存到指定路径");
+        return ResponseEntity.ok("http://localhost:8080/static/" + fileName);
     }
 
     @Resource
