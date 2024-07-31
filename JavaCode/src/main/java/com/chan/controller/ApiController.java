@@ -8,11 +8,13 @@ import com.chan.entity.ScriptExecResult;
 import com.chan.proto.CadDetProto;
 import com.chan.service.impl.CadContentServiceImpl;
 import com.chan.service.impl.GrpcScriptExecImpl;
+import com.chan.utils.ImageSaver;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,7 +28,7 @@ public class ApiController {
      * 功能：1. 调用python脚本并返回结果
      * 2. 数据库CRUD操作
      */
-    private List<CadDetProto.DetInfo> tempData;
+    private ScriptExecResult tempResult;
 
     private GrpcScriptExecImpl grpcScriptExec;
 
@@ -48,18 +50,17 @@ public class ApiController {
         String fileName = scriptExecResult.getFileName();
         List<CadDetProto.DetInfo> result = scriptExecResult.getResult();
 
-        this.tempData = result;
-
+        this.tempResult = scriptExecResult;
 
         return fileName + " " + result;
     }
 
-    // test
+    // 将数据以表格形式返回
     @PostMapping("/getDataForTable")
     public ResponseEntity<List<DetInfoDTO>> getDataForTable() {
 
         List<DetInfoDTO> dtos = new ArrayList<>();
-        for (CadDetProto.DetInfo detInfo : this.tempData) {
+        for (CadDetProto.DetInfo detInfo : this.tempResult.getResult()) {
             List<Integer> position = Arrays.asList(
                     detInfo.getPosition().getLeftTop(),
                     detInfo.getPosition().getRightTop(),
@@ -72,6 +73,25 @@ public class ApiController {
         return ResponseEntity.ok(dtos);
     }
 
+    // 将结果图片保存到指定路径
+    @PostMapping("/getResultImg")
+    public Object getResultImg() {
+
+        String fileName = this.tempResult.getFileName();
+        byte[] image = this.tempResult.getImage();
+
+        String outputPath = "D:/dev_code/java/projectGrpc/grpc-backend/src/main/resources/static/" + fileName;
+
+        try {
+            ImageSaver.saveImage(image, outputPath);
+            System.out.println("Image saved successfully.");
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to save image.", e);
+        }
+
+        return ResponseEntity.ok("图片已保存到指定路径");
+    }
+
     @Resource
     private CadContentServiceImpl dataService;
 
@@ -79,7 +99,9 @@ public class ApiController {
     @PostMapping("/create")
     public Object create() {
 
-        if (this.tempData != null) {
+        List<CadDetProto.DetInfo> tempData = this.tempResult.getResult();
+
+        if (tempData != null) {
             for (CadDetProto.DetInfo obj : tempData) {
 
                 int id = obj.getId();
@@ -95,7 +117,6 @@ public class ApiController {
 
                 dataService.save(new CadContent(position, value, id));
             }
-            tempData = null;
         } else {
             return ResponseEntity.badRequest().body("结果为空或未执行算法");
         }

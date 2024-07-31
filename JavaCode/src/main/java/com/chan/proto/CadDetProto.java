@@ -2240,16 +2240,10 @@ public final class CadDetProto {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>string filePath = 1;</code>
-     * @return The filePath.
+     * <code>bytes origImage = 1;</code>
+     * @return The origImage.
      */
-    java.lang.String getFilePath();
-    /**
-     * <code>string filePath = 1;</code>
-     * @return The bytes for filePath.
-     */
-    com.google.protobuf.ByteString
-        getFilePathBytes();
+    com.google.protobuf.ByteString getOrigImage();
   }
   /**
    * <pre>
@@ -2268,7 +2262,7 @@ public final class CadDetProto {
       super(builder);
     }
     private CadDetRequest() {
-      filePath_ = "";
+      origImage_ = com.google.protobuf.ByteString.EMPTY;
     }
 
     @java.lang.Override
@@ -2291,43 +2285,15 @@ public final class CadDetProto {
               com.chan.proto.CadDetProto.CadDetRequest.class, com.chan.proto.CadDetProto.CadDetRequest.Builder.class);
     }
 
-    public static final int FILEPATH_FIELD_NUMBER = 1;
-    @SuppressWarnings("serial")
-    private volatile java.lang.Object filePath_ = "";
+    public static final int ORIGIMAGE_FIELD_NUMBER = 1;
+    private com.google.protobuf.ByteString origImage_ = com.google.protobuf.ByteString.EMPTY;
     /**
-     * <code>string filePath = 1;</code>
-     * @return The filePath.
+     * <code>bytes origImage = 1;</code>
+     * @return The origImage.
      */
     @java.lang.Override
-    public java.lang.String getFilePath() {
-      java.lang.Object ref = filePath_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        filePath_ = s;
-        return s;
-      }
-    }
-    /**
-     * <code>string filePath = 1;</code>
-     * @return The bytes for filePath.
-     */
-    @java.lang.Override
-    public com.google.protobuf.ByteString
-        getFilePathBytes() {
-      java.lang.Object ref = filePath_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        filePath_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
+    public com.google.protobuf.ByteString getOrigImage() {
+      return origImage_;
     }
 
     private byte memoizedIsInitialized = -1;
@@ -2344,8 +2310,8 @@ public final class CadDetProto {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(filePath_)) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, filePath_);
+      if (!origImage_.isEmpty()) {
+        output.writeBytes(1, origImage_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -2356,8 +2322,9 @@ public final class CadDetProto {
       if (size != -1) return size;
 
       size = 0;
-      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(filePath_)) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, filePath_);
+      if (!origImage_.isEmpty()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(1, origImage_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -2374,8 +2341,8 @@ public final class CadDetProto {
       }
       com.chan.proto.CadDetProto.CadDetRequest other = (com.chan.proto.CadDetProto.CadDetRequest) obj;
 
-      if (!getFilePath()
-          .equals(other.getFilePath())) return false;
+      if (!getOrigImage()
+          .equals(other.getOrigImage())) return false;
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -2387,8 +2354,8 @@ public final class CadDetProto {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + FILEPATH_FIELD_NUMBER;
-      hash = (53 * hash) + getFilePath().hashCode();
+      hash = (37 * hash) + ORIGIMAGE_FIELD_NUMBER;
+      hash = (53 * hash) + getOrigImage().hashCode();
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -2524,7 +2491,7 @@ public final class CadDetProto {
       public Builder clear() {
         super.clear();
         bitField0_ = 0;
-        filePath_ = "";
+        origImage_ = com.google.protobuf.ByteString.EMPTY;
         return this;
       }
 
@@ -2559,7 +2526,7 @@ public final class CadDetProto {
       private void buildPartial0(com.chan.proto.CadDetProto.CadDetRequest result) {
         int from_bitField0_ = bitField0_;
         if (((from_bitField0_ & 0x00000001) != 0)) {
-          result.filePath_ = filePath_;
+          result.origImage_ = origImage_;
         }
       }
 
@@ -2607,10 +2574,8 @@ public final class CadDetProto {
 
       public Builder mergeFrom(com.chan.proto.CadDetProto.CadDetRequest other) {
         if (other == com.chan.proto.CadDetProto.CadDetRequest.getDefaultInstance()) return this;
-        if (!other.getFilePath().isEmpty()) {
-          filePath_ = other.filePath_;
-          bitField0_ |= 0x00000001;
-          onChanged();
+        if (other.getOrigImage() != com.google.protobuf.ByteString.EMPTY) {
+          setOrigImage(other.getOrigImage());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
@@ -2639,7 +2604,7 @@ public final class CadDetProto {
                 done = true;
                 break;
               case 10: {
-                filePath_ = input.readStringRequireUtf8();
+                origImage_ = input.readBytes();
                 bitField0_ |= 0x00000001;
                 break;
               } // case 10
@@ -2660,74 +2625,34 @@ public final class CadDetProto {
       }
       private int bitField0_;
 
-      private java.lang.Object filePath_ = "";
+      private com.google.protobuf.ByteString origImage_ = com.google.protobuf.ByteString.EMPTY;
       /**
-       * <code>string filePath = 1;</code>
-       * @return The filePath.
+       * <code>bytes origImage = 1;</code>
+       * @return The origImage.
        */
-      public java.lang.String getFilePath() {
-        java.lang.Object ref = filePath_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          filePath_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
+      @java.lang.Override
+      public com.google.protobuf.ByteString getOrigImage() {
+        return origImage_;
       }
       /**
-       * <code>string filePath = 1;</code>
-       * @return The bytes for filePath.
-       */
-      public com.google.protobuf.ByteString
-          getFilePathBytes() {
-        java.lang.Object ref = filePath_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          filePath_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>string filePath = 1;</code>
-       * @param value The filePath to set.
+       * <code>bytes origImage = 1;</code>
+       * @param value The origImage to set.
        * @return This builder for chaining.
        */
-      public Builder setFilePath(
-          java.lang.String value) {
+      public Builder setOrigImage(com.google.protobuf.ByteString value) {
         if (value == null) { throw new NullPointerException(); }
-        filePath_ = value;
+        origImage_ = value;
         bitField0_ |= 0x00000001;
         onChanged();
         return this;
       }
       /**
-       * <code>string filePath = 1;</code>
+       * <code>bytes origImage = 1;</code>
        * @return This builder for chaining.
        */
-      public Builder clearFilePath() {
-        filePath_ = getDefaultInstance().getFilePath();
+      public Builder clearOrigImage() {
         bitField0_ = (bitField0_ & ~0x00000001);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string filePath = 1;</code>
-       * @param value The bytes for filePath to set.
-       * @return This builder for chaining.
-       */
-      public Builder setFilePathBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) { throw new NullPointerException(); }
-        checkByteStringIsUtf8(value);
-        filePath_ = value;
-        bitField0_ |= 0x00000001;
+        origImage_ = getDefaultInstance().getOrigImage();
         onChanged();
         return this;
       }
@@ -2834,6 +2759,12 @@ public final class CadDetProto {
      */
     com.chan.proto.CadDetProto.DetInfoOrBuilder getDetInfoOrBuilder(
         int index);
+
+    /**
+     * <code>bytes resultImage = 3;</code>
+     * @return The resultImage.
+     */
+    com.google.protobuf.ByteString getResultImage();
   }
   /**
    * <pre>
@@ -2854,6 +2785,7 @@ public final class CadDetProto {
     private CadDetResponse() {
       fileName_ = "";
       detInfo_ = java.util.Collections.emptyList();
+      resultImage_ = com.google.protobuf.ByteString.EMPTY;
     }
 
     @java.lang.Override
@@ -2956,6 +2888,17 @@ public final class CadDetProto {
       return detInfo_.get(index);
     }
 
+    public static final int RESULTIMAGE_FIELD_NUMBER = 3;
+    private com.google.protobuf.ByteString resultImage_ = com.google.protobuf.ByteString.EMPTY;
+    /**
+     * <code>bytes resultImage = 3;</code>
+     * @return The resultImage.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString getResultImage() {
+      return resultImage_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -2976,6 +2919,9 @@ public final class CadDetProto {
       for (int i = 0; i < detInfo_.size(); i++) {
         output.writeMessage(2, detInfo_.get(i));
       }
+      if (!resultImage_.isEmpty()) {
+        output.writeBytes(3, resultImage_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -2991,6 +2937,10 @@ public final class CadDetProto {
       for (int i = 0; i < detInfo_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(2, detInfo_.get(i));
+      }
+      if (!resultImage_.isEmpty()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(3, resultImage_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -3011,6 +2961,8 @@ public final class CadDetProto {
           .equals(other.getFileName())) return false;
       if (!getDetInfoList()
           .equals(other.getDetInfoList())) return false;
+      if (!getResultImage()
+          .equals(other.getResultImage())) return false;
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -3028,6 +2980,8 @@ public final class CadDetProto {
         hash = (37 * hash) + DETINFO_FIELD_NUMBER;
         hash = (53 * hash) + getDetInfoList().hashCode();
       }
+      hash = (37 * hash) + RESULTIMAGE_FIELD_NUMBER;
+      hash = (53 * hash) + getResultImage().hashCode();
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -3171,6 +3125,7 @@ public final class CadDetProto {
           detInfoBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000002);
+        resultImage_ = com.google.protobuf.ByteString.EMPTY;
         return this;
       }
 
@@ -3219,6 +3174,9 @@ public final class CadDetProto {
         int from_bitField0_ = bitField0_;
         if (((from_bitField0_ & 0x00000001) != 0)) {
           result.fileName_ = fileName_;
+        }
+        if (((from_bitField0_ & 0x00000004) != 0)) {
+          result.resultImage_ = resultImage_;
         }
       }
 
@@ -3297,6 +3255,9 @@ public final class CadDetProto {
             }
           }
         }
+        if (other.getResultImage() != com.google.protobuf.ByteString.EMPTY) {
+          setResultImage(other.getResultImage());
+        }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
         return this;
@@ -3341,6 +3302,11 @@ public final class CadDetProto {
                 }
                 break;
               } // case 18
+              case 26: {
+                resultImage_ = input.readBytes();
+                bitField0_ |= 0x00000004;
+                break;
+              } // case 26
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -3669,6 +3635,38 @@ public final class CadDetProto {
         }
         return detInfoBuilder_;
       }
+
+      private com.google.protobuf.ByteString resultImage_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <code>bytes resultImage = 3;</code>
+       * @return The resultImage.
+       */
+      @java.lang.Override
+      public com.google.protobuf.ByteString getResultImage() {
+        return resultImage_;
+      }
+      /**
+       * <code>bytes resultImage = 3;</code>
+       * @param value The resultImage to set.
+       * @return This builder for chaining.
+       */
+      public Builder setResultImage(com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        resultImage_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bytes resultImage = 3;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearResultImage() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        resultImage_ = getDefaultInstance().getResultImage();
+        onChanged();
+        return this;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -3774,13 +3772,13 @@ public final class CadDetProto {
       "te\022\r\n\005value\030\001 \003(\t\"i\n\007DetInfo\022\n\n\002id\030\001 \001(\005" +
       "\022\'\n\010position\030\002 \001(\0132\025.CadDetProto.Positio" +
       "n\022)\n\tattribute\030\003 \001(\0132\026.CadDetProto.Attri" +
-      "bute\"!\n\rCadDetRequest\022\020\n\010filePath\030\001 \001(\t\"" +
-      "J\n\016CadDetResponse\022\021\n\tfile_name\030\001 \001(\t\022%\n\007" +
-      "detInfo\030\002 \003(\0132\024.CadDetProto.DetInfo2U\n\rC" +
-      "adDetService\022D\n\007Execute\022\032.CadDetProto.Ca" +
-      "dDetRequest\032\033.CadDetProto.CadDetResponse" +
-      "\"\000B\037\n\016com.chan.protoB\013CadDetProtoP\000b\006pro" +
-      "to3"
+      "bute\"\"\n\rCadDetRequest\022\021\n\torigImage\030\001 \001(\014" +
+      "\"_\n\016CadDetResponse\022\021\n\tfile_name\030\001 \001(\t\022%\n" +
+      "\007detInfo\030\002 \003(\0132\024.CadDetProto.DetInfo\022\023\n\013" +
+      "resultImage\030\003 \001(\0142U\n\rCadDetService\022D\n\007Ex" +
+      "ecute\022\032.CadDetProto.CadDetRequest\032\033.CadD" +
+      "etProto.CadDetResponse\"\000B\037\n\016com.chan.pro" +
+      "toB\013CadDetProtoP\000b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -3810,13 +3808,13 @@ public final class CadDetProto {
     internal_static_CadDetProto_CadDetRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_CadDetProto_CadDetRequest_descriptor,
-        new java.lang.String[] { "FilePath", });
+        new java.lang.String[] { "OrigImage", });
     internal_static_CadDetProto_CadDetResponse_descriptor =
       getDescriptor().getMessageTypes().get(4);
     internal_static_CadDetProto_CadDetResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_CadDetProto_CadDetResponse_descriptor,
-        new java.lang.String[] { "FileName", "DetInfo", });
+        new java.lang.String[] { "FileName", "DetInfo", "ResultImage", });
     com.google.protobuf.StructProto.getDescriptor();
   }
 

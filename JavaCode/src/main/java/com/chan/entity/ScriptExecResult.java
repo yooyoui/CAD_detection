@@ -13,4 +13,5 @@ import java.util.List;
 public class ScriptExecResult {
     private String fileName;
     private List<CadDetProto.DetInfo> result;
+    private byte[] image;
 }

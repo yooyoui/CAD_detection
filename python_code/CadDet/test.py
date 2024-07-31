@@ -1,14 +1,14 @@
+import io
 import sys
 import time
 from concurrent import futures
+from PIL import Image
 
 import grpc
 
-from Alog.det import DetModel
-from Alog.rec import RecModel
 from Alog.testController import TestController
 
-sys.path.append('D:\python_code\CadDet\proto')
+sys.path.append('D:\dev_code\python\CadDet\proto')
 from proto import cadDet_pb2
 from proto import cadDet_pb2_grpc
 
@@ -17,14 +17,17 @@ class ScriptServicer(cadDet_pb2_grpc.CadDetServiceServicer):
 
     def Execute(self, request, context):
 
-        s = request.filePath
-        print("Received request: %s" % s)
+        s = request.origImage
+
+        data = io.BytesIO(s)
+        image = Image.open(data)
+        image.save("test.png")
 
         # 创建一个 CadDetResponse 对象
         response = cadDet_pb2.CadDetResponse()
 
         # 填充 file_name 字段
-        response.file_name = s
+        response.file_name = "test.png"
 
         # 创建Controller对象获取位置和识别信息
         controller = TestController()
@@ -51,7 +54,8 @@ class ScriptServicer(cadDet_pb2_grpc.CadDetServiceServicer):
             for j in range(len(data1)):
                 det_info.attribute.value.append(data1[j])
 
-        print("response.detInfo: ", response.detInfo)
+        # 将字节流赋值给 response.resultImage
+        response.resultImage = s
 
         # 返回响应 response
         return response

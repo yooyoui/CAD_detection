@@ -30,6 +30,7 @@ message Attribute {
   repeated string value = 1;
 }
 
+
 // 检测信息
 message DetInfo {
   int32 id = 1;
@@ -39,11 +40,12 @@ message DetInfo {
 
 // 请求数据结构
 message CadDetRequest{
-  string filePath = 1;
+  bytes origImage = 1;
 }
 
 // 响应数据结构
 message CadDetResponse{
   string file_name = 1;
   repeated DetInfo detInfo = 2;
+  bytes resultImage = 3;
 }
