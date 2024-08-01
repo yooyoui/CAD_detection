@@ -44,13 +44,14 @@ message DetInfo {
 
 // 请求数据结构
 message CadDetRequest{
-  string filePath = 1;
+  bytes origImage = 1;
 }
 
 // 响应数据结构
 message CadDetResponse{
   string file_name = 1;
   repeated DetInfo detInfo = 2;
+  bytes resultImage = 3;
 }
 ```
 
@@ -68,7 +69,12 @@ message CadDetResponse{
   * 获得py算法处理的结果，并保留一份数据以便其他接口使用
 
 ```java
-	private List<CadDetProto.DetInfo> tempData;
+public class ApiController {
+    /**
+     * 功能：1. 调用python脚本并返回结果
+     * 2. 数据库CRUD操作
+     */
+    private ScriptExecResult tempResult;
 
     private GrpcScriptExecImpl grpcScriptExec;
 
@@ -90,8 +96,7 @@ message CadDetResponse{
         String fileName = scriptExecResult.getFileName();
         List<CadDetProto.DetInfo> result = scriptExecResult.getResult();
 
-        this.tempData = result;
-
+        this.tempResult = scriptExecResult;
 
         return fileName + " " + result;
     }
@@ -117,10 +122,21 @@ public class GrpcScriptExecImpl implements IScriptExec {
         // 参数1判空
         // 如果p为空，则返回一个ScriptExecResult对象，结果为null
         if (p.isEmpty()) return new ScriptExecResult();
+		
+        // 读取图片
+        byte[] origImg;
+        try {
+            origImg = Files.readAllBytes(Paths.get(p));
+        } catch (NoSuchFileException e) {
+            throw new RuntimeException("File not found at path: " + p, e);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read file at path: " + p, e);
+        }
+        if (origImg.length == 0) return new ScriptExecResult();
 
         // 构建请求
         CadDetProto.CadDetRequest.Builder builder = CadDetProto.CadDetRequest.newBuilder()
-                .setFilePath(p);
+                .setOrigImage(ByteString.copyFrom(origImg));
 
         // 执行请求
         CadDetProto.CadDetResponse response = cadStub.execute(builder.build());
@@ -128,7 +144,8 @@ public class GrpcScriptExecImpl implements IScriptExec {
         // 获取响应结果
         String fileName = response.getFileName();
         List<CadDetProto.DetInfo> detInfoList = response.getDetInfoList();
-        ScriptExecResult scriptExecResult = new ScriptExecResult(fileName, detInfoList);
+        byte[] resultImg = response.getResultImage().toByteArray();
+        ScriptExecResult scriptExecResult = new ScriptExecResult(fileName, detInfoList, resultImg);
 
         try {
             return scriptExecResult;
@@ -232,6 +249,49 @@ public class GrpcScriptExecImpl implements IScriptExec {
     }
 ```
 
+* 接口七、八：用于展示处理结果
+
+```java
+// 将数据以表格形式返回
+    @PostMapping("/getDataForTable")
+    public ResponseEntity<List<DetInfoDTO>> getDataForTable() {
+
+        List<DetInfoDTO> dtos = new ArrayList<>();
+        for (CadDetProto.DetInfo detInfo : this.tempResult.getResult()) {
+            List<Integer> position = Arrays.asList(
+                    detInfo.getPosition().getLeftTop(),
+                    detInfo.getPosition().getRightTop(),
+                    detInfo.getPosition().getRightBottom(),
+                    detInfo.getPosition().getLeftBottom()
+            );
+            List<String> attribute = new ArrayList<>(detInfo.getAttribute().getValueList());
+            dtos.add(new DetInfoDTO(detInfo.getId(), position, attribute));
+        }
+        return ResponseEntity.ok(dtos);
+    }
+
+// 将结果图片保存到指定路径
+    @PostMapping("/getResultImg")
+    public Object getResultImg() {
+
+        String fileName = this.tempResult.getFileName();
+        byte[] image = this.tempResult.getImage();
+
+        String outputPath = "D:/dev_code/java/projectGrpc/grpc-backend/src/main/resources/static/" + fileName;
+
+        try {
+            ImageSaver.saveImage(image, outputPath);
+            System.out.println("Image saved successfully.");
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to save image.", e);
+        }
+
+        return ResponseEntity.ok("http://localhost:8080/static/" + fileName);
+    }
+```
+
+
+
 ### python 服务端
 
 *接收java端的请求，并将算法运行的结果填充消息体，返回响应*
@@ -331,5 +391,5 @@ if __name__ == '__main__':
 1. 选择本地图片路径与调用算法
 2. 更新数据
 3. 删除数据
-4. 展示算法运行结果（暂未添加展示**图片内容**）
+4. 展示算法运行结果
 5. 读取数据库结果
