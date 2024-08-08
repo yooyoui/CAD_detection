@@ -1,25 +1,32 @@
 <template>
   <div class="ShowDb">
-    <span class="label-text">读取数据库结果</span>
+    <span class="label-text" style="font-size: 14px;color: grey">读取数据库结果</span>
     <hr>
-    <el-table :data="DBData" style="width: 100%" max-height="350px">
+    <el-table :data="DBData"
+              style="width: 100%;"
+              empty-text="点击读取数据以获取查看数据库"
+              border
+              show-header
+              height="200px"
+              max-height="200px">
       <el-table-column prop="id" label="ID"></el-table-column>
       <el-table-column prop="fileId" label="File ID"></el-table-column>
       <el-table-column prop="position" label="Position"></el-table-column>
       <el-table-column prop="value" label="Value"></el-table-column>
     </el-table>
-    <button name="readButton" @click="readData">读取数据</button>
+    <el-button name="readButton" @click="readData">读取数据</el-button>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue';
 import axios from 'axios';
+import {API_URL} from "@/config/apiConfig.js";
 
 const DBData = ref([]);
 
 const readData = () => {
-  axios.get('http://localhost:8080/CadDet/read').then(response => {
+  axios.get(`${API_URL}/read`).then(response => {
     console.log(response.data);
     DBData.value = response.data.map(item => ({
       id: item.id,
@@ -41,7 +48,7 @@ const readData = () => {
   width: 1000px;
 }
 
-button {
+.el-button {
   width: 100%;
 }
 

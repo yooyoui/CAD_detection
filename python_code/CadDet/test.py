@@ -55,6 +55,8 @@ class ScriptServicer(cadDet_pb2_grpc.CadDetServiceServicer):
                 det_info.attribute.value.append(data1[j])
 
         # 将字节流赋值给 response.resultImage
+        # 这里只是一个示例，实际需要传输的图片需要根据实际情况编写
+        # 这里仅将传送过来的图片字节流返回
         response.resultImage = s
 
         # 返回响应 response

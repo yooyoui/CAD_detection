@@ -30,7 +30,6 @@ message Attribute {
   repeated string value = 1;
 }
 
-
 // 检测信息
 message DetInfo {
   int32 id = 1;
